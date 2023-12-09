@@ -1,0 +1,21 @@
+.main {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 5px;
+}
+    
+.navbar { 
+    grid-area: 1 / 1 / 2 / 11;
+    padding: 15px; font-size: 1.5em;
+}
+.cam1 { 
+    grid-area: 3 / 1 / 7 / 4; 
+    background-color: black;
+}
+.cam2 { 
+    grid-area: 7 / 1 / 11 / 4;;
+
+}
+.textChat { grid-area: 3 / 4 / 11 / 11; }

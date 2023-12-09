@@ -1,0 +1,19 @@
+input {
+    width: 90%; display: block; border: none; height: 30px;
+}
+input:focus {
+    outline: none;
+}
+form {
+    margin-top: 20px;
+}
+label {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: var(--font-primary);
+    font-size: 12px;
+}
+
+span {
+    display: block; margin-top: 15px;
+}
