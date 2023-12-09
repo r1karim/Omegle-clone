@@ -2,7 +2,7 @@
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    grid-column-gap: 0px;
+    grid-column-gap: 25px;
     grid-row-gap: 5px;
 }
     
@@ -11,11 +11,40 @@
     padding: 15px; font-size: 1.5em;
 }
 .cam1 { 
-    grid-area: 3 / 1 / 7 / 4; 
-    background-color: black;
+    grid-area: 3 / 1 / 7 / 4;  display: block;
+    background-color: rgb(22, 22, 22); display: flex; justify-content: center;
 }
 .cam2 { 
-    grid-area: 7 / 1 / 11 / 4;;
+    background-color: rgb(22, 22, 22); 
+    grid-area: 7 / 1 / 11 / 4;display: block;display: flex; justify-content: center;
 
 }
-.textChat { grid-area: 3 / 4 / 11 / 11; }
+.textChat { 
+    grid-area: 3 / 4 / 11 / 11; 
+    background-color: rgb(22, 22, 22); 
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+}
+
+.textBox {
+    flex-grow: 100; padding: 10px;
+}
+
+.textInput {
+    flex-grow: 1; display: flex;
+}
+
+.textInput button {
+    border-radius: 0;
+}
+
+.textInput input {
+    height: 100%;
+}
+.messages {
+
+}
+
+.message {
+    
+}
