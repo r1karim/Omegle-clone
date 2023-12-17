@@ -1,6 +1,24 @@
+import react, { useState } from "react";
 import style from "./Login.module.css";
+import httpClient from "../httpClient";
 
 export default function () {
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const registerUser = async ( ) => {
+        try {
+            const response = await httpClient.post("//localhost:5000/register", {username, email , password});
+            window.location.href= "/";
+        }
+        catch(error) {
+            if(error.response.status == 401) {
+                console.log("error: username or email already in use");
+            }
+        }
+    }
+
     const main= {
         display:"grid",
         gridTemplateColumns: "repeat(8, 1fr)",
@@ -29,18 +47,18 @@ export default function () {
                     <form>
                         <span>
                             <label>Email</label>
-                            <input />
+                            <input value={email} onChange={ (e) => {setEmail(e.target.value)}} />
                         </span>
                         <span>
                             <label>Username</label>
-                            <input />
+                            <input value={username} onChange={ (e) => {setUsername(e.target.value)}} />
                         </span>
                         <span>
                             <label>Password</label>
-                            <input/>
+                            <input value={password} onChange={ (e) => {setPassword(e.target.value)}} />
                         </span>
                         <p><a>Already have an account?</a></p>
-                        <button>Register</button>
+                        <button type="button" onClick={registerUser} >Register</button>
                     </form>
                 </div>
             </div>

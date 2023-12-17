@@ -1,5 +1,22 @@
+import React, { useState } from "react";
 import style from "./Login.module.css";
+import httpClient from "../httpClient";
+
 export default function () {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const loginUser = async () => {
+        try {
+            const response = await httpClient.post("//localhost:5000/login", {email, password});
+            window.location.href="/";
+        }
+        catch(error) {
+            if(error.response.status == 401) {
+                console.log("invalid credentials.");
+            }
+        }
+
+    }
     const main= {
         display:"grid",
         gridTemplateColumns: "repeat(8, 1fr)",
@@ -27,14 +44,14 @@ export default function () {
                     <form>
                         <span>
                             <label>Email</label>
-                            <input />
+                            <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </span>
                         <span>
                             <label>Password</label>
-                            <input/>
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </span>
                         <p><a>Forgot your password?</a></p>
-                        <button>Login</button>
+                        <button type="button" onClick={loginUser}>Login</button>
                         <p>Need an account? <a>Register</a></p>
                     </form>
                 </div>

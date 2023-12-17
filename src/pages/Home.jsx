@@ -1,4 +1,5 @@
 import Button from "../Button/Button";
+import bg from "../images/ttbg.jpg"
 
 function Home() {
     const styles={
@@ -8,8 +9,8 @@ function Home() {
     }
     return (
       <>
-        <div className="main">
-          <div class="side">
+        <div className="main" style={{ backgroundImage: `url(${bg})`, backgroundSize: "200px"  }} >
+          <div className="side">
             <div className="title">
               <h1>Start chatting now!</h1>
               <input placeholder="Add your interests (Optional)" />
@@ -21,7 +22,7 @@ function Home() {
   
             </div>
           </div>
-          <div class="section">
+          <div className="section">
             <h4>About us</h4>
             This is an omegle copycat made by the great developer adri711 with the intention of creating a safer platform where you can chat anonymously as well as safely.
             <h4>what do we offer?</h4> To rid you of bots and ban evaders we made this website user-account based which means you're required to create and login to your account to use our services. Within chats you're completely anonymous but you get an option to reveal your user to the other end. We also offer direct messages between befriended users.

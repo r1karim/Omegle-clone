@@ -1,10 +1,12 @@
 import React from 'react';
 import style from "./camChat.module.css";
 import loading from "../images/loading.gif"
+import bg from "../images/ttbg.jpg"
+
 export default function() {
     return(
         <>
-            <div className={style.main}>
+            <div className={style.main} style={{ backgroundImage: `url(${bg})`,  backgroundSize: "200px" }}>
                 <div  className={style.navbar}>Omegle</div>
                 <div className={style.cam1}>
                     <img src={loading} width={300}></img>
