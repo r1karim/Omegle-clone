@@ -1,5 +1,7 @@
 import Button from "../Button/Button";
 import bg from "../images/ttbg.jpg"
+import httpClient from "../httpClient";
+import react, { useEffect,useState } from "react";
 
 function Home() {
     const styles={
@@ -7,6 +9,30 @@ function Home() {
       flexDirection:"column",
       margin:"10px"
     }
+    const [isLogged, setLogged] = useState(false);
+    useEffect( () => {
+      (async() => {
+          try {
+              const resp = await httpClient.get("//localhost:5000/@me");
+              setLogged(true);
+          }
+          catch (error) {
+              if(error.response.status == 401) {
+                setLogged(false);
+              }
+          }
+      })();
+    } );
+    const logout = async () => {
+      try {
+        const response = await httpClient.get("//localhost:5000/logout");
+        window.location.href="/";
+      }
+      catch(error) {
+        console.log("Connection error: ", error);
+      }
+    }
+    
     return (
       <>
         <div className="main" style={{ backgroundImage: `url(${bg})`, backgroundSize: "200px"  }} >
@@ -16,8 +42,8 @@ function Home() {
               <input placeholder="Add your interests (Optional)" />
   
               <div style={styles}>
-                <Button text="Video chat" color="orange"></Button>
-                <Button text="Text chat" color="orange"></Button>
+                <button onClick={() => { window.location.href = isLogged ? "/video": "/login" }} color="orange">Video chat</button>
+                <button onClick={() => { window.location.href = isLogged ? "/video": "/login" }} color="orange">Text chat</button>
               </div>
   
             </div>
@@ -28,18 +54,13 @@ function Home() {
             <h4>what do we offer?</h4> To rid you of bots and ban evaders we made this website user-account based which means you're required to create and login to your account to use our services. Within chats you're completely anonymous but you get an option to reveal your user to the other end. We also offer direct messages between befriended users.
             Our chats will be moderated by AI, nudity and/or any NSFW activities won't be tolerated! Keep it clean. 
             <h4>Your chat history</h4>
-            <div className="chatHistory">
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-              <div>You had a video chat from 09-12-2023 23:12:10 till 09-12-2023 23:18:23</div>
-            </div>
+            { isLogged && <button type="button" onClick={logout}>Logout</button> }
+            { !isLogged && 
+              <button type="button" onClick={() => {window.location.href="/login"}}>Login</button>
+            }
+            { !isLogged && 
+              <button type="button" onClick={() => {window.location.href="/register"}} style={{'margin-left': "10px"}}>Register</button>
+            }
           </div>
         </div>
       </>

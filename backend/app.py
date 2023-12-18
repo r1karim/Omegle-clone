@@ -7,12 +7,30 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SECRET_KEY"]="very secret key"
 
 bcrypt = Bcrypt(app)
 db.init_app(app)
 CORS(app, supports_credentials=True)
 with app.app_context():
     db.create_all()
+
+@app.route("/@me", methods=["GET", "POST"])
+def get_user():
+    if not session.get("userid"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user = User.query.filter_by(id = session.get("userid")).first()
+    return jsonify({'id': user.id, 'email':user.email}),200
+
+@app.route("/logout")
+def logout():
+    if not session.get("userid"):
+        return "", 200
+    
+    session.pop("userid")
+    return "", 200
+
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -27,7 +45,7 @@ def register():
         abort(409)
 
     hashed_password = bcrypt.generate_password_hash(password)
-    new_user = User(username=username,email=email, password=password)
+    new_user = User(username=username,email=email, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
 
@@ -49,12 +67,12 @@ def login():
             "error": "Unauthorized"
         }),401
     
-    if not bcrypt.check_password_hash(password, user.password):
+    if not bcrypt.check_password_hash(user.password, password):
         return jsonify({
             "error": "Unauthorized"
         }), 401
     
-    session['id'] = user.id
+    session['userid'] = user.id
 
     return jsonify({
         "email": email,

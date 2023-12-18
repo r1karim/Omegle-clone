@@ -1,8 +1,21 @@
-import react, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./Login.module.css";
 import httpClient from "../httpClient";
 
 export default function () {
+
+    useEffect( () => {
+        (async() => {
+            try {
+                const resp = await httpClient.get("//localhost:5000/@me");
+                window.location.href="/";
+            }
+            catch {
+
+            }
+        })();
+    } );
+
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -18,6 +31,8 @@ export default function () {
             }
         }
     }
+
+    
 
     const main= {
         display:"grid",

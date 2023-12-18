@@ -1,10 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import style from "./Login.module.css";
 import httpClient from "../httpClient";
 
 export default function () {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    useEffect( () => {
+        (async() => {
+            try {
+                const resp = await httpClient.get("//localhost:5000/@me");
+                //setUser(resp.data);
+                window.location.href="/";
+            }
+            catch {
+
+            }
+        })();
+    } );
+
     const loginUser = async () => {
         try {
             const response = await httpClient.post("//localhost:5000/login", {email, password});
