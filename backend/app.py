@@ -21,7 +21,7 @@ def get_user():
         return jsonify({"error": "Unauthorized"}), 401
 
     user = User.query.filter_by(id = session.get("userid")).first()
-    return jsonify({'id': user.id, 'email':user.email}),200
+    return jsonify({'id': user.id, 'email':user.email, 'username': user.username}),200
 
 @app.route("/logout")
 def logout():
@@ -75,6 +75,7 @@ def login():
     session['userid'] = user.id
 
     return jsonify({
+        "id": user.id,
         "email": email,
         "username":user.username
     })

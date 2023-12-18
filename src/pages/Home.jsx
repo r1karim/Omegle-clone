@@ -2,6 +2,7 @@ import Button from "../Button/Button";
 import bg from "../images/ttbg.jpg"
 import httpClient from "../httpClient";
 import react, { useEffect,useState } from "react";
+import { User } from "../user";
 
 function Home() {
     const styles={
@@ -9,16 +10,17 @@ function Home() {
       flexDirection:"column",
       margin:"10px"
     }
-    const [isLogged, setLogged] = useState(false);
+    const [ user, setUser] = useState(new User(0, "", ""));
+
     useEffect( () => {
       (async() => {
           try {
               const resp = await httpClient.get("//localhost:5000/@me");
-              setLogged(true);
+              setUser(resp.data);
           }
           catch (error) {
               if(error.response.status == 401) {
-                setLogged(false);
+                console.log("Unauthorized");
               }
           }
       })();
@@ -42,8 +44,8 @@ function Home() {
               <input placeholder="Add your interests (Optional)" />
   
               <div style={styles}>
-                <button onClick={() => { window.location.href = isLogged ? "/video": "/login" }} color="orange">Video chat</button>
-                <button onClick={() => { window.location.href = isLogged ? "/video": "/login" }} color="orange">Text chat</button>
+                <button onClick={() => { window.location.href = user.id ? "/video": "/login" }} color="orange">Video chat</button>
+                <button onClick={() => { window.location.href = user.id ? "/video": "/login" }} color="orange">Text chat</button>
               </div>
   
             </div>
@@ -53,12 +55,13 @@ function Home() {
             This is an omegle copycat made by the great developer adri711 with the intention of creating a safer platform where you can chat anonymously as well as safely.
             <h4>what do we offer?</h4> To rid you of bots and ban evaders we made this website user-account based which means you're required to create and login to your account to use our services. Within chats you're completely anonymous but you get an option to reveal your user to the other end. We also offer direct messages between befriended users.
             Our chats will be moderated by AI, nudity and/or any NSFW activities won't be tolerated! Keep it clean. 
-            <h4>Your chat history</h4>
-            { isLogged && <button type="button" onClick={logout}>Logout</button> }
-            { !isLogged && 
+            <h4>Welcome to omegle { !Boolean(user.id) && "anonymous!" } { Boolean(user.id) && user.username }</h4>
+            { !Boolean(user.id) && <p>You can login or register here:</p>}
+            { Boolean(user.id) && <button type="button" onClick={logout}>Logout</button> }
+            { !Boolean(user.id) && 
               <button type="button" onClick={() => {window.location.href="/login"}}>Login</button>
             }
-            { !isLogged && 
+            { !Boolean(user.id) && 
               <button type="button" onClick={() => {window.location.href="/register"}} style={{'margin-left': "10px"}}>Register</button>
             }
           </div>
