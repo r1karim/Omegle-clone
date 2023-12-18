@@ -1,9 +1,12 @@
 from flask import Flask, request, abort, jsonify,session
+from flask_socketio import SocketIO, join_room,emit
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from models import db, User
+import time
 
 app = Flask(__name__)
+socketio = SocketIO(app,cors_allowed_origins="*")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -11,10 +14,12 @@ app.config["SECRET_KEY"]="very secret key"
 
 bcrypt = Bcrypt(app)
 db.init_app(app)
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True,resources={r"/*":{"origins":"*"}})
 with app.app_context():
     db.create_all()
 
+
+users_queue = {}
 @app.route("/@me", methods=["GET", "POST"])
 def get_user():
     if not session.get("userid"):
@@ -80,5 +85,32 @@ def login():
         "username":user.username
     })
 
+@socketio.on('connect')
+def on_user_connect(*auth):
+    print("User connected")
+    if len(users_queue) == 0:
+        users_queue[ str( session['userid'] ) ] = request.sid 
+        return
+
+    elif len(users_queue) == 1:
+        if list(users_queue.keys())[0] == str(session['userid']):
+            users_queue[ str(session['userid']) ] = request.sid
+            return
+    
+    curr_time = str(time.time())
+    join_room(f"{curr_time}",sid=users_queue[ list(users_queue.keys())[0] ])
+    join_room(f"{curr_time}",sid=request.sid)
+    
+    users_queue.pop( list(users_queue.keys())[0])
+    emit("chat", "Joined chat.",room=curr_time)
+    print("Created a  room for two users, queue empty: ", users_queue)
+
+
+
+
+@socketio.on('disconnect')
+def on_user_connect():
+    print(" A user has disconnected!")
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app,debug=True)

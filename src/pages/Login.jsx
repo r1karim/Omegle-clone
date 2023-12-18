@@ -10,11 +10,10 @@ export default function () {
         (async() => {
             try {
                 const resp = await httpClient.get("//localhost:5000/@me");
-                //setUser(resp.data);
                 window.location.href="/";
             }
             catch {
-
+                console.log("Failed to connect.");
             }
         })();
     } );

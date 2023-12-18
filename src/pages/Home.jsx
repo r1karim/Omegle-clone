@@ -5,12 +5,13 @@ import react, { useEffect,useState } from "react";
 import { User } from "../user";
 
 function Home() {
+  const [ user, setUser] = useState(new User(0, "", ""));
+
     const styles={
       display:"flex",
       flexDirection:"column",
       margin:"10px"
     }
-    const [ user, setUser] = useState(new User(0, "", ""));
 
     useEffect( () => {
       (async() => {
