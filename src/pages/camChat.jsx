@@ -27,18 +27,7 @@ export default function() {
         }
     }
 
-    function joinQueue() {
-        socket.emit("join_queue");
-    }
-    function clearChat() {
-        setMessages([]);
-    }
-    function addMessage(message) {
-        let temp = messages;
-        temp.push(message)
-        setMessages(temp);
-    }
-    joinQueue();
+    socket.emit("join_queue");
     useEffect(() => {
 
         socketInstance.on('chat', (data) => {
@@ -49,11 +38,11 @@ export default function() {
             else {
                 if(data.type == "room_closure") {
                     setAnon(null);
-                    joinQueue();
-                    clearChat();
+                    socket.emit("join_queue");
+                    setMessages([]);
                 }
                 else if (data.type == "message") {
-                    addMessage(data)
+                    setMessages([...messages, data])
                 }
             }
         });
