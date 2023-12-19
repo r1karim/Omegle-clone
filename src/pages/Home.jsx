@@ -6,26 +6,25 @@ import { User } from "../user";
 
 function Home() {
   const [ user, setUser] = useState(new User(0, "", ""));
-
     const styles={
       display:"flex",
       flexDirection:"column",
       margin:"10px"
     }
 
-    useEffect( () => {
-      (async() => {
-          try {
-              const resp = await httpClient.get("//localhost:5000/@me");
-              setUser(resp.data);
+  useEffect( () => {
+    (async() => {
+      try {
+            const resp = await httpClient.get("//localhost:5000/@me");
+            setUser(resp.data);
           }
-          catch (error) {
-              if(error.response.status == 401) {
-                console.log("Unauthorized");
-              }
+      catch (error) {
+          if(error.response.status == 401) {
+             console.log("Unauthorized");
+           }
           }
       })();
-    } );
+    }, [] );
     const logout = async () => {
       try {
         const response = await httpClient.get("//localhost:5000/logout");

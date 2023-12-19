@@ -20,6 +20,9 @@ with app.app_context():
 
 
 users_queue = {}
+active_rooms = []
+active_users = {}
+
 @app.route("/@me", methods=["GET", "POST"])
 def get_user():
     if not session.get("userid"):
@@ -68,27 +71,57 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user is None:
-        return jsonify({
-            "error": "Unauthorized"
-        }),401
+        return jsonify({"error": "Unauthorized" }),401
     
     if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({
-            "error": "Unauthorized"
-        }), 401
+        return jsonify({"error": "Unauthorized"}), 401
     
     session['userid'] = user.id
 
     return jsonify({
         "id": user.id,
         "email": email,
-        "username":user.username
-    })
+        "username":user.username })
+
+def send_chatroom_message(chatroom,data):
+    for user in chatroom:
+        emit("chat", data, to=active_users[str(user)])
 
 @socketio.on('connect')
 def on_user_connect(*auth):
-    print("User connected")
-    if len(users_queue) == 0:
+    active_users[str(session['userid'])] = request.sid
+
+@socketio.on('disconnect')
+def on_user_connect():
+    print("user disconnected")
+    if str( session["userid"] ) in users_queue:
+        users_queue.pop(str(session['userid']))
+
+    for room in active_rooms:
+        send_chatroom_message(room, {"type": "room_closure"})
+        active_rooms.remove(room)
+        break
+    
+    try:
+        active_users.pop(str(session['userid']))
+    except Exception as e:
+        print(e)
+
+
+
+@socketio.on("chat")
+def on_user_chat(data):
+    print(data)
+
+    for room in active_rooms:
+        if session['userid'] in room:
+            room = list(room)
+            emit("chat",{"type": "message","content": data["content"], "sender": room[0]==session['userid']}, to=active_users[str(room[0])])
+            emit("chat",{"type": "message","content": data["content"], "sender": room[1]==session['userid']}, to=active_users[str(room[1])])
+            return
+@socketio.on("join_queue")
+def user_join_queue():
+    if not len(users_queue):
         users_queue[ str( session['userid'] ) ] = request.sid 
         return
 
@@ -96,21 +129,18 @@ def on_user_connect(*auth):
         if list(users_queue.keys())[0] == str(session['userid']):
             users_queue[ str(session['userid']) ] = request.sid
             return
+
+    other_user_id = list(users_queue.keys())[0] 
+    chat_room = set([int(session['userid']), int(other_user_id)])
+
+    if chat_room not in active_rooms:
+        active_rooms.append(chat_room)
+
+    users_queue.pop( other_user_id )
+
+    send_chatroom_message(chat_room, "Joined chat")
+
+    print(active_rooms)
     
-    curr_time = str(time.time())
-    join_room(f"{curr_time}",sid=users_queue[ list(users_queue.keys())[0] ])
-    join_room(f"{curr_time}",sid=request.sid)
-    
-    users_queue.pop( list(users_queue.keys())[0])
-    emit("chat", "Joined chat.",room=curr_time)
-    print("Created a  room for two users, queue empty: ", users_queue)
-
-
-
-
-@socketio.on('disconnect')
-def on_user_connect():
-    print(" A user has disconnected!")
-
 if __name__ == "__main__":
     socketio.run(app,debug=True)
