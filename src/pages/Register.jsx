@@ -70,7 +70,7 @@ export default function () {
                         </span>
                         <span>
                             <label>Password</label>
-                            <input value={password} onChange={ (e) => {setPassword(e.target.value)}} />
+                            <input type= "password" value={password} onChange={ (e) => {setPassword(e.target.value)}} />
                         </span>
                         <p><a>Already have an account?</a></p>
                         <button type="button" onClick={registerUser} >Register</button>
