@@ -91,11 +91,16 @@ def send_chatroom_message(chatroom,data):
 def on_user_connect(*auth):
     active_users[str(session['userid'])] = request.sid
 
+def send_disconnection_notification(user_id):
+    emit("user_disconnected", {"userId": user_id}, broadcast=True)
+
 @socketio.on('disconnect')
 def on_user_connect():
     print("user disconnected")
-    if str( session["userid"] ) in users_queue:
-        users_queue.pop(str(session['userid']))
+    user_id = str(session.get("userid"))
+    
+    if user_id in users_queue:
+        users_queue.pop(user_id)
 
     for room in active_rooms:
         send_chatroom_message(room, {"type": "room_closure"})
@@ -103,8 +108,9 @@ def on_user_connect():
         break
     
     try:
-        active_users.pop(str(session['userid']))
-    except Exception as e:
+        active_users.pop(user_id)
+        send_disconnection_notification(user_id)
+    except AssertionError as e:
         print(e)
 
 

@@ -13,10 +13,12 @@ const socket = io("localhost:5000/", {
 
 export default function () {
   const [socketInstance, setSocket] = useState(socket);
+  const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [anon, setAnon] = useState(null);
   const [disconnected, setDisconnected] = useState(false);
+
   const listMessages = messages.map((message) => (
     <div>
       {message.sender ? (
@@ -57,6 +59,13 @@ export default function () {
         }
       }
     });
+    /* useEffect(() => {
+      socket.on("user_disconnected", function (data) {
+        var disconnectedUserId = data.userId;
+        // Update the UI to reflect the disconnection
+        // For example, remove the disconnected user from the user list or display a notification
+      });
+    }, []); */
 
     return () => socketInstance.off("chat");
   });
@@ -86,7 +95,7 @@ export default function () {
           </div>
           <div className={style.textInput}>
             {disconnected ? (
-              <span>Disconnected</span>
+              <button onClick={handleReconnect}>Reconnect</button>
             ) : (
               <>
                 <button onClick={disconnect}>Disconnect</button>{" "}
