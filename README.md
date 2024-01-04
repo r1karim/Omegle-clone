@@ -53,7 +53,3 @@ Contributions to the Omegleclone application are welcome! If you would like to c
 5. Submit a pull request to the main repository.
 
 Please ensure that your code follows the existing coding style and conventions. Include appropriate tests and documentation for your changes.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
