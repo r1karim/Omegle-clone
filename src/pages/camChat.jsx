@@ -18,6 +18,7 @@ export default function () {
   const [message, setMessage] = useState("");
   const [anon, setAnon] = useState(null);
   const [disconnected, setDisconnected] = useState(false);
+  const [disconnectedUsers, setDisconnectedUsers] = useState([]);
 
   const listMessages = messages.map((message) => (
     <div>
@@ -59,16 +60,24 @@ export default function () {
         }
       }
     });
-    /* useEffect(() => {
-      socket.on("user_disconnected", function (data) {
-        var disconnectedUserId = data.userId;
-        // Update the UI to reflect the disconnection
-        // For example, remove the disconnected user from the user list or display a notification
-      });
-    }, []); */
 
     return () => socketInstance.off("chat");
   });
+
+  useEffect(() => {
+    socketInstance.on("user_disconnected", handleUserDisconnected);
+
+    return () => {
+      socketInstance.off("user_disconnected", handleUserDisconnected);
+    };
+  }, []);
+
+  const handleUserDisconnected = (data) => {
+    setDisconnectedUsers((prevUsers) => [...prevUsers, data.userId]);
+  };
+  const handleReconnect = () => {
+    socketInstance.connect();
+  };
 
   return (
     <>
@@ -95,9 +104,25 @@ export default function () {
           </div>
           <div className={style.textInput}>
             {disconnected ? (
-              <button onClick={handleReconnect}>Reconnect</button>
+              <>
+                <div className={style.textChat}>
+                  <ul>
+                    {disconnectedUsers.map((userId) => (
+                      <li key={userId}>{`Anonymous has disconnected`}</li>
+                    ))}
+                  </ul>
+                </div>
+                <button onClick={handleReconnect}>Reconnect</button>
+              </>
             ) : (
               <>
+                <div className={style.textChat}>
+                  <ul>
+                    {disconnectedUsers.map((userId) => (
+                      <li key={userId}>{`Anonymous has disconnected`}</li>
+                    ))}
+                  </ul>
+                </div>
                 <button onClick={disconnect}>Disconnect</button>{" "}
                 {/* Add onClick event handler */}
                 <input
