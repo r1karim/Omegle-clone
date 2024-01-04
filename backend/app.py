@@ -92,10 +92,11 @@ def on_user_connect(*auth):
     active_users[str(session['userid'])] = request.sid
 
 def send_disconnection_notification(user_id):
+    message = f"User {user_id} has disconnected"
     emit("user_disconnected", {"userId": user_id}, broadcast=True)
 
 @socketio.on('disconnect')
-def on_user_connect():
+def on_user_disconnect():
     print("user disconnected")
     user_id = str(session.get("userid"))
     
