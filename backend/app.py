@@ -2,6 +2,8 @@ from flask import Flask, request, abort, jsonify,session
 from flask_socketio import SocketIO, join_room,emit
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from models import db, User
 import time
 
@@ -14,6 +16,8 @@ app.config["SECRET_KEY"]="very secret key"
 
 bcrypt = Bcrypt(app)
 db.init_app(app)
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 CORS(app, supports_credentials=True,resources={r"/*":{"origins":"*"}})
 with app.app_context():
     db.create_all()
@@ -62,6 +66,43 @@ def register():
             "email": new_user.email
         })
 
+@app.route("/passwordreset", methods=["POST"])
+def reset_password():
+    email = request.json["email"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        abort(404)
+
+    token = serializer.dumps(email, salt="password-reset")
+    reset_link = f"http://your-website.com/reset?token={token}"
+
+    msg = Message("Password Reset", sender="your-email@gmail.com", recipients=[email])
+    msg.body = f"Click the link to reset your password: {reset_link}"
+    mail.send(msg)
+
+    return jsonify(message="Password reset email sent"), 200
+
+app.route("/passwordresetconfirm", methods=["POST"])
+def reset_password_confirm():
+    token = request.json["token"]
+    new_password = request.json["new_password"]
+
+    try:
+        email = serializer.loads(token, salt="password-reset", max_age=3600)
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            abort(404)
+
+        hashed_password = bcrypt.generate_password_hash(new_password)
+        user.password = hashed_password
+        db.session.commit()
+
+        return jsonify(message="Password reset successful"), 200
+    except SignatureExpired:
+        return jsonify(message="Password reset link has expired"), 400
 
 @app.route("/login", methods=["POST"])
 def login():
