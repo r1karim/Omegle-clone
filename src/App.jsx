@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "./pages/Home"
-import Login from "./pages/Login"
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 import Register from "./pages/Register";
 import CamChat from "./pages/camChat";
+import ForgotPassword from "./pages/passwordreset";
 function App() {
   return (
     <BrowserRouter>
@@ -11,10 +12,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/passwordreset" element={<ForgotPassword />} />
         <Route path="/video" element={<CamChat />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
