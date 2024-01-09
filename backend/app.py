@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, join_room,emit
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_mail import Mail, Message
+from flask_login import login_required
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from models import db, User
 import time
@@ -103,6 +104,7 @@ def reset_password_confirm():
         return jsonify(message="Password reset successful"), 200
     except SignatureExpired:
         return jsonify(message="Password reset link has expired"), 400
+    
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -135,6 +137,7 @@ def on_user_connect(*auth):
 def send_disconnection_notification(user_id):
     message = f"User {user_id} has disconnected"
     emit("user_disconnected", {"userId": user_id}, broadcast=True)
+    
 
 @socketio.on('disconnect')
 def on_user_disconnect():
@@ -189,6 +192,12 @@ def user_join_queue():
     send_chatroom_message(chat_room, "Joined chat")
 
     print(active_rooms)
+
+@app.route("/reconnect", methods=["POST"])
+def reconnect():
+    user_id = session.get("userid")
+    active_users[str(session['userid'])] = request.sid
+    
     
 if __name__ == "__main__":
     socketio.run(app,debug=True)
