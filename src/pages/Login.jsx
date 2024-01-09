@@ -78,7 +78,9 @@ export default function () {
               />
             </span>
             <p>
-              <a>Forgot your password?</a>
+              <a>
+                <Link to="/passwordreset"> Forgot your password? </Link>
+              </a>
             </p>
             <button type="button" onClick={loginUser}>
               Login

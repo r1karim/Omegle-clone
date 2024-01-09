@@ -19,6 +19,7 @@ export default function () {
   const [anon, setAnon] = useState(null);
   const [disconnected, setDisconnected] = useState(false);
   const [disconnectedUsers, setDisconnectedUsers] = useState([]);
+  const [showDisconnectMessage, setShowDisconnectMessage] = useState(false);
 
   const listMessages = messages.map((message) => (
     <div>
@@ -77,6 +78,10 @@ export default function () {
   };
   const handleReconnect = () => {
     socketInstance.connect();
+    /*setShowDisconnectMessage(true);
+    setTimeout(() => {
+      setShowDisconnectMessage(false);
+    }, 2000);*/
   };
 
   return (
@@ -105,24 +110,15 @@ export default function () {
           <div className={style.textInput}>
             {disconnected ? (
               <>
-                <div className={style.textChat}>
-                  <ul>
-                    {disconnectedUsers.map((userId) => (
-                      <li key={userId}>{`Anonymous has disconnected`}</li>
-                    ))}
-                  </ul>
-                </div>
+                {showDisconnectMessage && (
+                  <div className={style.disconnectMessage}>
+                    Anonymous has disconnected
+                  </div>
+                )}
                 <button onClick={handleReconnect}>Reconnect</button>
               </>
             ) : (
               <>
-                <div className={style.textChat}>
-                  <ul>
-                    {disconnectedUsers.map((userId) => (
-                      <li key={userId}>{`Anonymous has disconnected`}</li>
-                    ))}
-                  </ul>
-                </div>
                 <button onClick={disconnect}>Disconnect</button>{" "}
                 {/* Add onClick event handler */}
                 <input
